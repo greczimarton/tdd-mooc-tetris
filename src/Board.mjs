@@ -2,7 +2,8 @@ export class Board {
   width;
   height;
   blocks;
-  get oneIsFalling() {
+
+  hasFalling() {
     for (let i = 0; i < this.blocks.length; i++) {
       if (this.blocks[i].isFalling) return true;
     }
@@ -31,7 +32,7 @@ export class Board {
   }
 
   drop(block) {
-    if (this.oneIsFalling) {
+    if (this.hasFalling()) {
       throw "already falling";
     }
 
@@ -43,7 +44,8 @@ export class Board {
 
   tick() {
     for (let i = 0; i < this.blocks.length; i++) {
-      if (this.blocks[i].isFalling) this.blocks[i].y -= 1;
+      if (this.blocks[i].isFalling && this.blocks[i].y - 1 >= 0)
+        this.blocks[i].y -= 1;
     }
   }
 }
