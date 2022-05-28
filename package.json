@@ -29,7 +29,7 @@
     "parallel": true
   },
   "scripts": {
-    "test": "mocha --require test/testing.mjs 'test/**/*.test.mjs'",
+    "test": "mocha --debug-brk --require test/testing.mjs 'test/**/*.test.mjs'",
     "autotest": "npm run test -- --watch",
     "format": "prettier --write ."
   }
