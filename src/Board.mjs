@@ -44,10 +44,25 @@ export class Board {
 
   tick() {
     for (let i = 0; i < this.blocks.length; i++) {
-      if (this.blocks[i].y == 0) this.blocks[i].isFalling = false;
-      if (this.blocks[i].isFalling && this.blocks[i].y - 1 >= 0) {
+      const highestInColumn = this.getHighestPointInColumn(this.blocks[i].x);
+      if (this.blocks[i].y == highestInColumn) this.blocks[i].isFalling = false;
+      if (this.blocks[i].isFalling && this.blocks[i].y - 1 >= highestInColumn) {
         this.blocks[i].y -= 1;
       }
     }
+  }
+
+  getHighestPointInColumn(column) {
+    let highest = 0;
+
+    if (this.blocks.length == 0) return highest;
+    const blocksInColumn = this.blocks.filter(
+      (t) => t.x == column && t.isFalling == false
+    );
+    for (let i = 0; i < blocksInColumn.length; i++) {
+      if (this.blocks[i].x == column && this.blocks[i].y > highest);
+      highest = this.blocks[i].y + 1;
+    }
+    return highest;
   }
 }
