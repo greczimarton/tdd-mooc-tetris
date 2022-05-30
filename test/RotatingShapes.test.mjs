@@ -16,6 +16,7 @@ describe("Rotating 3x3 shape", () => {
     );
   });
 
+
   it("can be rotated right/clockwise", () => {
     expect(shape.rotateRight().toString()).to.equalShape(
       `GDA
