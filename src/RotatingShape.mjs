@@ -1,38 +1,74 @@
+import _ from "lodash";
+
 export class RotatingShape {
   shape;
 
-  constructor(shapeString) {
-    const data = shapeString.split("\n");
-    this.shape = new Array(data.length);
-    for (let i = 0; i < data.length; i++) {
-      if (!this.shape[i]) this.shape[i] = [];
-      data[i] = data[i].trim();
-      for (let j = 0; j < data[i].length; j++) {
-        this.shape[i].push(data[i][j]);
+  constructor(shapeData) {
+    if (typeof shapeData === 'string') {
+      const data = shapeData.split("\n");
+      this.shape = new Array(data.length);
+      for (let i = 0; i < data.length; i++) {
+        if (!this.shape[i]) this.shape[i] = [];
+        data[i] = data[i].trim();
+        for (let j = 0; j < data[i].length; j++) {
+          this.shape[i].push(data[i][j]);
+        }
       }
     }
+    else {
+      this.shape = shapeData
+    }
+    Object.freeze(this);
   }
 
   rotateRight() {
-    const left = 0;
-    const right = this.shape.length - 1;
+    const shapeCopy = _.cloneDeep(this.shape);
+    let left = 0;
+    let right = shapeCopy.length - 1;
 
     while (left < right) {
-      for (let i = 0; i < right - 1; i++) {
+      for (let i = left; i <= right - 1; i++) {
         const top = left;
         const bottom = right;
 
-        const temp = this.shape[top][left + i];
+        const temp = shapeCopy[top][left + i];
 
-        this.shape[top][left + i] = this.shape[bottom - i][left];
-        this.shape[bottom - i][left] = this.shape[bottom][right - i];
-        this.shape[bottom][right - i] = this.shape[top + i][right];
-        this.shape[top + i][right] = temp;
+        shapeCopy[top][left + i] = shapeCopy[bottom - i][left];
+        shapeCopy[bottom - i][left] = shapeCopy[bottom][right - i];
+        shapeCopy[bottom][right - i] = shapeCopy[top + i][right];
+        shapeCopy[top + i][right] = temp;
       }
+
+      left += 1;
+      right -= 1;
     }
 
+    return new RotatingShape(shapeCopy);
+  }
 
-    return this;
+  rotateLeft() {
+    const shapeCopy = _.cloneDeep(this.shape);
+    let left = 0;
+    let right = shapeCopy.length - 1;
+
+    while (left < right) {
+      for (let i = left; i <= right - 1; i++) {
+        const top = left;
+        const bottom = right;
+
+        const temp = shapeCopy[top][left + i];
+
+        shapeCopy[top][left + i] = shapeCopy[top + i][right];
+        shapeCopy[top + i][right] = shapeCopy[bottom][right - i];
+        shapeCopy[bottom][right - i] = shapeCopy[bottom - i][left];
+        shapeCopy[bottom - i][left] = temp;
+      }
+
+      left += 1;
+      right -= 1;
+    }
+
+    return new RotatingShape(shapeCopy);
   }
 
 
