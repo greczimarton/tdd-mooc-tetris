@@ -81,4 +81,8 @@ export class RotatingShape {
     }
     return shapeString;
   }
+
+  getShape() {
+    return _.cloneDeep(this.shape);
+  }
 }

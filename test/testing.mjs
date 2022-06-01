@@ -11,8 +11,8 @@ Assertion.addMethod("equalShape", function (expected) {
   expected = normalize(expected);
   this.assert(
     actual === expected,
-    "expected #{this} to equal #{exp} but got #{act}",
-    "expected #{this} to not equal #{act}",
+    "expected: \n#{this}\nto equal: \n#{exp}\n but got: \n#{act}",
+    "expected: \n#{this}\nto not equal: \n#{act}",
     expected,
     actual
   );
