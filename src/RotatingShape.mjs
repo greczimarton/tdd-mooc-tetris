@@ -43,54 +43,31 @@ export class RotatingShape {
     }
 
     return new RotatingShape(shapeCopy);
-
-    // let left = 0;
-    // let right = shapeCopy.length - 1;
-
-    // while (left < right) {
-    //   for (let i = left; i <= right - 1; i++) {
-    //     const top = left;
-    //     const bottom = right;
-
-    //     const temp = shapeCopy[top][left + i];
-
-    //     shapeCopy[top][left + i] = shapeCopy[bottom - i][left];
-    //     shapeCopy[bottom - i][left] = shapeCopy[bottom][right - i];
-    //     shapeCopy[bottom][right - i] = shapeCopy[top + i][right];
-    //     shapeCopy[top + i][right] = temp;
-    //   }
-
-    //   left += 1;
-    //   right -= 1;
-    // }
-
-    // return new RotatingShape(shapeCopy);
   }
 
+  /*
+    0.0 => 2.0
+    0.1 => 1.0
+    0.2 => 0.0
+    1.0 => 2.1
+    1.1 => 1.1
+    1.2 => 0.1
+    2.0 => 0.0
+    2.1 => 0.1
+    2.2 => 0.2
+  */
   rotateLeft() {
-    return this.rotateRight().rotateRight().rotateRight()
-    // const shapeCopy = _.cloneDeep(this.shape);
-    // let left = 0;
-    // let right = shapeCopy.length - 1;
+    //return this.rotateRight().rotateRight().rotateRight();
+    const shapeCopy = _.cloneDeep(this.shape);
+    const dim = shapeCopy.length
 
-    // while (left < right) {
-    //   for (let i = left; i <= right - 1; i++) {
-    //     const top = left;
-    //     const bottom = right;
+    for (let row = 0; row < dim; row++) {
+      for (let column = 0; column < dim; column++) {
+        shapeCopy[dim - 1 - column][row] = this.shape[row][column]
+      }
+    }
 
-    //     const temp = shapeCopy[top][left + i];
-
-    //     shapeCopy[top][left + i] = shapeCopy[top + i][right];
-    //     shapeCopy[top + i][right] = shapeCopy[bottom][right - i];
-    //     shapeCopy[bottom][right - i] = shapeCopy[bottom - i][left];
-    //     shapeCopy[bottom - i][left] = temp;
-    //   }
-
-    //   left += 1;
-    //   right -= 1;
-    // }
-
-    // return new RotatingShape(shapeCopy);
+    return new RotatingShape(shapeCopy);
   }
 
 
