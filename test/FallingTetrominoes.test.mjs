@@ -27,7 +27,68 @@ describe("Falling tetrominoes", () => {
     );
   });
 
-  xit("stop when they hit the bottom", () => {
+  it("drop correctly once", () => {
+    board.drop(Tetromino.T_SHAPE);
+    board.tick()
+
+    expect(board.toString()).to.equalShape(
+      `..........
+       ....T.....
+       ...TTT....
+       ..........
+       ..........
+       ..........`
+    );
+  });
+
+  it("drop correctly twice", () => {
+    board.drop(Tetromino.T_SHAPE);
+    board.tick()
+    board.tick()
+
+    expect(board.toString()).to.equalShape(
+      `..........
+       ..........
+       ....T.....
+       ...TTT....
+       ..........
+       ..........`
+    );
+  });
+
+  it("drop correctly thrice", () => {
+    board.drop(Tetromino.T_SHAPE);
+    for (let i = 0; i < 3; i++) {
+      board.tick()
+    }
+
+    expect(board.toString()).to.equalShape(
+      `..........
+       ..........
+       ..........
+       ....T.....
+       ...TTT....
+       ..........`
+    );
+  });
+
+  it("drop correctly four times", () => {
+    board.drop(Tetromino.T_SHAPE);
+    for (let i = 0; i < 4; i++) {
+      board.tick();
+    }
+
+    expect(board.toString()).to.equalShape(
+      `..........
+       ..........
+       ..........
+       ..........
+       ....T.....
+       ...TTT....`
+    );
+  });
+
+  it("stop when they hit the bottom", () => {
     board.drop(Tetromino.T_SHAPE);
     fallToBottom(board);
 
@@ -41,7 +102,7 @@ describe("Falling tetrominoes", () => {
     );
   });
 
-  xit("stop when they land on another block", () => {
+  it("stop when they land on another block", () => {
     board.drop(Tetromino.T_SHAPE);
     fallToBottom(board);
     board.drop(Tetromino.T_SHAPE);

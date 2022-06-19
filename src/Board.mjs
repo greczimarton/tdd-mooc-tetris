@@ -1,10 +1,68 @@
 import { Block } from "./Block.mjs";
 import { Tetromino } from "./Tetromino.mjs";
+import _ from "lodash";
 
 export class Board {
   width;
   height;
   blocks;
+  array;
+
+
+
+  constructor(width, height) {
+    this.width = width;
+    this.height = height;
+    this.blocks = new Array();
+    this.array = [];
+    this.initBoardArray()
+  }
+
+  updateBoard() {
+    this.initBoardArray()
+    for (const block in this.blocks) {
+      this.writeBlockIntoArray(this.blocks[block])
+    }
+  }
+
+  initBoardArray() {
+    for (let y = this.height - 1; 0 <= y; y--) {
+      this.array[y] = [];
+      for (let x = 0; x < this.width; x++) {
+        this.array[y][x] = "."
+      }
+    }
+    return this.array
+  }
+
+  writeBlockIntoArray(block) {
+    const heightCoord = this.height - 1;
+    const blockShape = block.toArray();
+    for (let row = 0; row < blockShape.length; row++) {
+      for (let column = 0; column < blockShape.length; column++) {
+        if (blockShape[row][column] != ".") {
+          this.array[(heightCoord - block.row) + row][block.column + column] = blockShape[row][column];
+        }
+      }
+    }
+  }
+
+  drop(dropped) {
+    if (this.hasFalling()) {
+      throw "already falling";
+    }
+
+    dropped = dropped instanceof Tetromino ? new Block(dropped) : dropped;
+
+    const offset = dropped instanceof Block ? Math.floor(dropped.toArray().length / 2) : 0;
+
+    dropped.column = Math.floor((this.width - 1) / 2) - offset;
+    dropped.row = this.height - 1;
+    dropped.isFalling = true;
+    this.blocks.push(dropped);
+
+    this.updateBoard();
+  }
 
   hasFalling() {
     for (let i = 0; i < this.blocks.length; i++) {
@@ -13,106 +71,77 @@ export class Board {
     return false;
   }
 
-  constructor(width, height) {
-    this.width = width;
-    this.height = height;
-    this.blocks = new Array();
+  tick() {
+    for (let i = 0; i < this.blocks.length; i++) {
+      if (this.blocks[i].isFalling == false)
+        continue
+      if (this.blockCanFall(this.blocks[i])) {
+        this.blocks[i].row -= 1;
+      } else {
+        this.blocks[i].isFalling = false;
+      }
+    }
+    this.updateBoard();
+  }
+
+  blockCanFall(block) {
+    const blockBodyCoordinates = this.getBlockBodyCoordinates(block)
+
+    for (let i = 0; i < blockBodyCoordinates.length; i++) {
+      const coordinate = _.cloneDeep(blockBodyCoordinates[i]);
+      coordinate.row -= 1
+      // if (_.find(blockBodyCoordinates, t => t.row == coordinate.row && t.column == coordinate.column)) {
+      //   continue
+      // }
+
+      if (coordinate.row < 0) {
+        return false;
+      }
+
+      if (_.find(blockBodyCoordinates, t => t.row == coordinate.row && t.column == coordinate.column)) {
+        continue
+      }
+
+      if (collision && this.array[this.array.length - 1 - coordinate.row][coordinate.column] != ".") {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  getBlockBodyCoordinates(block) {
+    const blockBodyCoordinates = []
+
+    const blockArray = block.toArray();
+    for (let row = 0; row < blockArray.length; row++) {
+      for (let column = 0; column < blockArray.length; column++) {
+        if (blockArray[row][column] == ".") {
+          continue
+        }
+
+        blockBodyCoordinates.push({
+          row: block.row - row,
+          column: block.column + column
+        })
+      }
+    }
+
+    return blockBodyCoordinates
   }
 
   toString() {
-    let array = this.initBoardArray();
-    for (const block in this.blocks) {
-      array = this.writeBlockIntoArray(this.blocks[block], array)
-    }
-
-    return this.arrayToString(array)
-
-
-    /*
-    for (let y = this.height - 1; 0 <= y; y--) {
-      for (let x = 0; x < this.width; x++) {
-        let currentCell = "";
-        this.blocks.forEach((t) => {
-          if (t.y == y && t.x == x) {
-            currentCell = t.toString();
-          }
-        });
-        board += currentCell ? currentCell : ".";
-      }
-      board += "\n";
-    }
-    return board;
-    */
+    return this.arrayToString()
   }
 
-  initBoardArray() {
-    let array = []
-    for (let y = this.height - 1; 0 <= y; y--) {
-      array[y] = [];
-      for (let x = 0; x < this.width; x++) {
-        array[y][x] = "."
-      }
-    }
-    return array
-  }
-
-  writeBlockIntoArray(block, array) {
-    const heightCoord = this.height - 1;
-    const blockShape = block.toArray();
-    for (let row = 0; row < blockShape.length; row++) {
-      for (let column = 0; column < blockShape.length; column++) {
-        array[(heightCoord - block.row) + row][block.column + column] = blockShape[row][column];
-      }
-    }
-    return array;
-  }
-
-  arrayToString(array) {
+  arrayToString() {
     let string = ""
     for (let row = 0; row < this.height; row++) {
       for (let column = 0; column < this.width; column++) {
-        string += array[row][column]
+        string += this.array[row][column]
       }
       string += "\n";
     }
     return string;
-  }
-
-  drop(dropped) {
-    if (this.hasFalling()) {
-      throw "already falling";
-    }
-    if (dropped instanceof Tetromino) {
-      dropped = new Block(dropped)
-    }
-
-    dropped.column = Math.floor((this.width - 1) / 2) - dropped.offset;
-    dropped.row = this.height - 1;
-    dropped.isFalling = true;
-    this.blocks.push(dropped);
-  }
-
-  tick() {
-    for (let i = 0; i < this.blocks.length; i++) {
-      const highestInColumn = this.getHighestPointInColumn(this.blocks[i].column);
-      if (this.blocks[i].row == highestInColumn) this.blocks[i].isFalling = false;
-      if (this.blocks[i].isFalling && this.blocks[i].row - 1 >= highestInColumn) {
-        this.blocks[i].row -= 1;
-      }
-    }
-  }
-
-  getHighestPointInColumn(column) {
-    let highest = 0;
-
-    if (this.blocks.length == 0) return highest;
-    const blocksInColumn = this.blocks.filter(
-      (t) => t.column == column && t.isFalling == false
-    );
-    for (let i = 0; i < blocksInColumn.length; i++) {
-      if (this.blocks[i].x == column && this.blocks[i].row > highest);
-      highest = this.blocks[i].row + 1;
-    }
-    return highest;
   }
 }

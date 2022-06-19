@@ -2,7 +2,6 @@ export class Block {
   shape;
   row;
   column;
-  offset;
   color;
   isFalling;
 
@@ -10,14 +9,10 @@ export class Block {
     if (typeof (data) === "string") {
       this.shape = null;
       this.color = data;
-      this.offset = 0;
     }
     else {
       this.shape = data;
-      this.offset = 1;
     }
-    this.x = 0;
-    this.y = 0;
     this.isFalling = false;
   }
 
