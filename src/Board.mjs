@@ -75,7 +75,7 @@ export class Board {
     for (let i = 0; i < this.blocks.length; i++) {
       if (this.blocks[i].isFalling == false)
         continue
-      if (this.blockCanFall(this.blocks[i])) {
+      if (this.testBlockNewPostion(this.blocks[i], "DOWN")) {
         this.blocks[i].row -= 1;
       } else {
         this.blocks[i].isFalling = false;
@@ -84,15 +84,74 @@ export class Board {
     this.updateBoard();
   }
 
-  blockCanFall(block) {
+  moveLeft() {
+    if (this.hasFalling() == false) {
+      return
+    }
+
+    const block = this.getFallingBlock();
+
+    if (this.testBlockNewPostion(block, "LEFT")) {
+      block.column -= 1;
+    }
+    this.updateBoard();
+  }
+
+  moveRight() {
+    if (this.hasFalling() == false) {
+      return
+    }
+
+    const block = this.getFallingBlock();
+
+    if (this.testBlockNewPostion(block, "RIGHT")) {
+      block.column += 1;
+    }
+    this.updateBoard();
+  }
+
+  moveDown() {
+    if (this.hasFalling() == false) {
+      return
+    }
+
+    const block = this.getFallingBlock();
+
+    if (this.testBlockNewPostion(block, "DOWN")) {
+      block.row -= 1;
+    } else {
+      block.isFalling = false;
+    }
+
+    this.updateBoard();
+  }
+
+  getFallingBlock() {
+    for (let i = 0; i < this.blocks.length; i++) {
+      if (this.blocks[i].isFalling) {
+        return this.blocks[i]
+      }
+    }
+  }
+
+  testBlockNewPostion(block, direction) {
     const blockBodyCoordinates = this.getBlockBodyCoordinates(block)
 
     for (let i = 0; i < blockBodyCoordinates.length; i++) {
       const coordinate = _.cloneDeep(blockBodyCoordinates[i]);
-      coordinate.row -= 1
-      // if (_.find(blockBodyCoordinates, t => t.row == coordinate.row && t.column == coordinate.column)) {
-      //   continue
-      // }
+      switch (direction) {
+        case "LEFT":
+          coordinate.column -= 1
+          break;
+        case "RIGHT":
+          coordinate.column += 1
+          break;
+        case "DOWN":
+          coordinate.row -= 1
+          break;
+        default:
+          throw "Invalid direction"
+      }
 
       if (coordinate.row < 0) {
         return false;
@@ -102,7 +161,7 @@ export class Board {
         continue
       }
 
-      if (collision && this.array[this.array.length - 1 - coordinate.row][coordinate.column] != ".") {
+      if (this.array[this.array.length - 1 - coordinate.row][coordinate.column] != ".") {
         return false;
       }
     }
